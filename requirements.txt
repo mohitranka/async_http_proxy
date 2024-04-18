@@ -1,2 +1,2 @@
-aiohttp==3.9.2
+aiohttp==3.9.4
 aiohttp_requests==0.1.2
