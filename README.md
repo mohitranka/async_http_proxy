@@ -1,42 +1,74 @@
 # async_http_proxy
 
-A simple HTTP proxy ( no support for HTTPS yet). 
+A small **asynchronous HTTP proxy** written in Python (`aiohttp`). Useful for local debugging, traffic inspection, and learning how proxies work.
 
-## How to run?
+> **Note:** HTTP only for now — HTTPS/CONNECT tunneling is not supported yet.
 
-You can either
+## Features
 
-1. `docker-compose up` - It would run the proxy on your localhost on port 8080 in a container
-2. `HTTP_PROXY_PORT=<port-of-your-choice> python3 proxy.py`
+- Async request forwarding with `aiohttp`
+- Docker and bare-metal run modes
+- `/stats` endpoint (uptime, bytes transferred)
+- Basic range-header handling
+- Pytest suite for smoke checks
+- Apache 2.0 license
 
-## How to test?
+## Quick start
 
-There is a small testsuite in tests.py, that tests for sanity of the proxy. You can run it
-with the following commands.
+### With Docker Compose
 
-1. `pip install -r test_requirements.txt`
-2. `pytest tests.py`
+```bash
+docker-compose up
+# Proxy listens on http://localhost:8080
+```
 
-## How to use it 
+### With Python
 
-You can set the proxy at the application level eg. for your browser that allow for setting 
-browser specific `HTTP_PROXY` (such as Firefox) or `$http_proxy` variable for commandline applications.
+```bash
+pip install -r requirements.txt
+HTTP_PROXY_PORT=8080 python3 proxy.py
+```
 
-**At the moment, docker based proxy does not work if `HTTP_PROXY` is set at os level.** If you intent to 
-set the `HTTP_PROXY` for the entire os I suggest running proxy as a python process on the host.
-computer.
+## Use it
 
-### Stats
+Point an app or browser at the proxy:
 
-Once the proxy is up and running, you can go to `http://localhost:8080/stats` to see the following information
-as json
+```bash
+export http_proxy=http://localhost:8080
+curl -x http://localhost:8080 http://example.com
+```
 
-* uptime
-* bytes transferred
+Or set the HTTP proxy in Firefox / another browser that supports per-app proxies.
+
+**Docker note:** if `HTTP_PROXY` is already set at the OS level, prefer running the proxy as a host Python process so the container is not affected by that setting.
+
+## Stats
+
+With the proxy running:
+
+```text
+http://localhost:8080/stats
+```
+
+Returns JSON with:
+
+- `uptime`
+- `bytes transferred` (and related counters)
+
+## Tests
+
+```bash
+pip install -r test_requirements.txt
+pytest tests.py
+```
+
+## Limitations
+
+- No HTTPS / CONNECT support yet
+- Intended for local/dev use, not as a hardened production edge proxy
 
 ## License
-Released under Apache 2.0. Please see [License](License) to see full terms.
 
-## Copyright
+Apache 2.0 — see [LICENSE](LICENSE).
 
-© 2019 Mohit Ranka
+© Mohit Ranka
